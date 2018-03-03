@@ -1,0 +1,224 @@
+<html>
+    <head>
+        <title>
+            Load JSON values
+        </title>
+         <meta charset="UTF-8"> 
+         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+         <script language = "javascript" type = "text/javascript">
+     var ajaxRequest;  // The variable that makes Ajax possible!
+               
+               try {
+                  // Opera 8.0+, Firefox, Safari
+                  ajaxRequest = new XMLHttpRequest();
+               }catch (e) {
+                  // Internet Explorer Browsers
+                  try {
+                     ajaxRequest = new ActiveXObject("Msxml2.XMLHTTP");
+                  }catch (e) {
+                     try{
+                        ajaxRequest = new ActiveXObject("Microsoft.XMLHTTP");
+                     }catch (e){
+                        // Something went wrong
+                        alert("Your browser broke!");
+                        
+                     }
+                  }
+               }
+            //Browser Support Code
+            function ajaxFunc(){
+               
+               
+               // Create a function that will receive data 
+               // sent from the server and will update
+               // div section in the same page.
+					
+               
+               
+               // Now get the value from user and pass it to
+               // server script.
+              
+				
+              // console.log(queryString);
+                 ajaxRequest.open("GET", "https://www.quandl.com/api/v3/datasets.json?query="+document.getElementById("search").value+"&database_code=BSE&per_page=100&page=1&api_key=yourAPIKEY" , false);
+               //ajaxRequest.setRequestHeader("Content-type", "application/json");
+               //ajaxRequest.responseType='json';
+               ajaxRequest.onreadystatechange = quotesService;
+               ajaxRequest.send(null); 
+
+               ajaxRequest.open("GET", "https://api.cognitive.microsoft.com/bing/v5.0/news/search?q="+document.getElementById("search").value+"&api-key=YourApiKey&count=10&offset=0&mkt=en-us&safeSearch=Moderate" , false);
+               ajaxRequest.setRequestHeader("Content-type", "application/json");
+               ajaxRequest.setRequestHeader("Ocp-Apim-Subscription-Key", "fe6a98b6ba604989b6efd55b5fa246f0");
+               //ajaxRequest.responseType='json';
+               ajaxRequest.onreadystatechange = newsService;
+               ajaxRequest.send(null); 
+               
+            
+               
+            }
+            function getMyStock(stock){
+                console.log(stock);
+                  ajaxRequest.onreadystatechange = function(){
+                  
+                   if(ajaxRequest.readyState == 4){
+                     var getText = ajaxRequest.responseText;
+                     var ajaxDiv=document.getElementById('quote');
+                     var myJSON=JSON.parse(getText);
+                     console.log(myJSON);
+                     var text= `<div class="container" >`;
+                     
+                        text+=`<table class="table table-hover table-border table-striped" 
+    <tr>
+      <th>Date</th>
+      <th>Open</th>
+      <th>High</th>
+    </tr>
+     <tr>
+      <td>`+myJSON.dataset_data.data[0][0]+`</td>
+      <td>`+myJSON.dataset_data.data[0][1]+`</td>
+      <td>`+myJSON.dataset_data.data[0][2]+`</td>
+    </tr>
+    <tr>
+      <th>Low</th>
+      <th>Close</th>
+      <th>WAP</th>
+    </tr>
+   <tr>
+      <td>`+myJSON.dataset_data.data[0][3]+`</td>
+      <td>`+myJSON.dataset_data.data[0][4]+`</td>
+      <td>`+myJSON.dataset_data.data[0][5]+`</td>
+    </tr>
+    <tr>
+      <th>No Of Shares</th>
+      <th>No of Trades</th>
+      <th>Total Turnover</th>
+    </tr>
+    <tr>
+      <td>`+myJSON.dataset_data.data[0][6]+`</td>
+      <td>`+myJSON.dataset_data.data[0][7]+`</td>
+      <td>`+myJSON.dataset_data.data[0][8]+`</td>
+    </tr>
+    <tr>
+    <tr>
+      <th>Deliverable Quantity</th>
+      <th>% Deli. Qty to Traded Qty</th>
+      <th>Spread H-L</th>
+    </tr>
+   <tr>
+      <td>`+myJSON.dataset_data.data[0][9]+`</td>
+      <td>`+myJSON.dataset_data.data[0][10]+`</td>
+      <td>`+myJSON.dataset_data.data[0][11]+`</td>
+    </tr>
+  
+    
+    
+  </table>  
+                   `;
+                   ajaxDiv.innerHTML=text;
+                   document.getElementById('suggest').innerHTML="" ;
+                   }
+               }
+               console.log("hey");
+               ajaxRequest.open("GET", "https://www.quandl.com/api/v3/datasets/BSE/"+stock+"/data.json?api_key=yourAPIKEY" , false);
+               ajaxRequest.send(null); 
+
+            }
+             function newsService(){
+                 console.log("newsService");
+                  if(ajaxRequest.readyState == 4){
+                     var ajaxDisplay = document.getElementById('ajaxDiv');
+                     var getText = ajaxRequest.responseText;
+                     var ajaxDiv=document.getElementById('ajaxDiv');
+                     var myJSON=JSON.parse(getText);
+                     console.log(myJSON);
+                     var text="";
+                     console.log(myJSON.value);
+                        console.log(ajaxDisplay);
+                    text+=`<ul class="list-group">`;
+                    for(i=0;i<myJSON.value.length;i++){
+                                    text+=`<div class ="list-group-item"><div class="container-fluid">
+                                               <div class="row">
+                                                  <div class="col-lg-2 text-center">
+                                                                    `;
+                        if(typeof myJSON.value[i].image==='undefined')
+                        {}
+                        else{
+                            text+=`<img class="center-block img-responsive" src=`+myJSON.value[i].image.thumbnail.contentUrl+` width="auto" height='auto'>`;
+                        }
+                                   text +=`</div>
+                                                                <div class="col-lg-8">
+                                                                    <a href=`+myJSON.value[i].url+`><h4>`+myJSON.value[i].name+`</h4></a>
+                                                                    `+myJSON.value[i].description+`   
+                                                                </div>
+                                                                </div>
+                                                                </div>
+                                                                 </div>
+                                                       `;
+                  
+                  }
+                  text+=` </ul>`;
+                   ajaxDiv.innerHTML=text;
+                  }
+               }
+                function quotesService(){
+                  if(ajaxRequest.readyState == 4){
+                     var getText = ajaxRequest.responseText;
+                     var ajaxDiv=document.getElementById('quote');
+                     var myJSON=JSON.parse(getText);
+                     var text="";
+                     console.log(myJSON);
+                    text+=`<div class="list-group">`;
+                  for(i=0;i<10;i++)
+                  {  var send=myJSON.datasets[i];
+                    console.log("send"+send);
+                    text+='<div class="list-group-item" ><a onClick="getMyStock(\''+send.dataset_code+'\')">'+myJSON.datasets[i].name+'</a> </div>';
+                  } text+='</div>';
+                   ajaxDiv.innerHTML=text;
+                 
+                  }
+               }
+         //-->
+
+      </script>
+    </head>
+<body>
+    <div ><nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+  <div class="container-fluid">
+    <div class="container">
+        <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand page-scroll" href="#">NewsService</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+          <a class="page-scroll">My News</a>
+        </li>
+       </ul>
+    </div>
+    <!-- /.navbar-collapse -->
+  </div>
+  <!-- /.container-fluid -->
+</nav>
+  </div>
+<br><br><br>
+<div class="container">
+<h1>News</h1>
+<form class="form-group" name="searchStock" (submit)="onSubmit()">
+    <input type="text" class="form-control" id="search">   
+    <input class="btn btn-primary" class="form-control" id="stock" type="button" onclick="ajaxFunc()" value="Load Values">
+    <div id="suggest"></div>
+    <div id="quote"></div>
+    <div id="ajaxDiv"></div>
+    </div>
+    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"/>
+</body>
+</html>
